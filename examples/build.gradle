@@ -104,7 +104,7 @@ tasks.register('runExample13Instance1', JavaExec) {
     systemProperty 'org.quartz.properties', 'org/quartz/examples/example13/instance1.properties'
 }
 tasks.register('runExample13Instance2', JavaExec) {
-    description = 'Run Example 13 Instance 1'
+    description = 'Run Example 13 Instance 2'
     mainClass = 'org.quartz.examples.example13.ClusterExample'
     systemProperty 'org.quartz.properties', 'org/quartz/examples/example13/instance2.properties'
 }
