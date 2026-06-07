@@ -8,6 +8,8 @@ dependencies {
 
     implementation "org.slf4j:slf4j-api:$slf4jVersion"
     implementation "org.slf4j:slf4j-log4j12:$slf4jVersion"
+
+    implementation("com.microsoft.sqlserver:mssql-jdbc:13.4.0.jre11")
 }
 
 tasks.withType(JavaExec).configureEach {
@@ -71,13 +73,38 @@ tasks.register('runExample12Server', JavaExec) {
     mainClass = 'org.quartz.examples.example12.RemoteServerExample'
     systemProperty 'org.quartz.properties', 'org/quartz/examples/example12/server.properties'
 }
+tasks.named('processResources', ProcessResources) {
+    // replace placeholders in properties files
+    def tokens = [
+        instanceName : providers.gradleProperty("instanceName").orNull,
+        instanceId: providers.gradleProperty("instanceId").orNull,
+        dbName : providers.gradleProperty("dbName").orNull
+    ]
+    inputs.properties(tokens)
+    filesMatching("**/*.properties") {
+        expand(tokens)
+    }
+}
+tasks.register('runExample13Instance', JavaExec) {
+    description = 'Run Example 13 Instance - all start multiple times and pass parameters'
+    mainClass = 'org.quartz.examples.example13.ClusterExample'
+    // cd quartz
+    // ../gradlew :examples:processResources :examples:runExample13Instance -PdbName=mssql -PinstanceName=serverScheduler -PinstanceId=instanceId_001
+    // ../gradlew :examples:processResources :examples:runExample13Instance -PdbName=mssql -PinstanceName=updateTemplateScheduler -PinstanceId=instanceId_001
+    def dynamicUuid = UUID.randomUUID().toString()
+    def instanceName= providers.gradleProperty("instanceName").orNull
+    def instanceId= providers.gradleProperty("instanceId").orNull
+    def dbName= providers.gradleProperty("dbName").orNull
+    systemProperty 'quartz.unique.instance.id', "${instanceId}_${instanceName}_${dynamicUuid}"
+    systemProperty 'org.quartz.properties', "org/quartz/examples/example13/${dbName}/instance.properties"
+}
 tasks.register('runExample13Instance1', JavaExec) {
     description = 'Run Example 13 Instance 1'
     mainClass = 'org.quartz.examples.example13.ClusterExample'
     systemProperty 'org.quartz.properties', 'org/quartz/examples/example13/instance1.properties'
 }
 tasks.register('runExample13Instance2', JavaExec) {
-    description = 'Run Example 13 Instance 2'
+    description = 'Run Example 13 Instance 1'
     mainClass = 'org.quartz.examples.example13.ClusterExample'
     systemProperty 'org.quartz.properties', 'org/quartz/examples/example13/instance2.properties'
 }
