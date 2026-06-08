@@ -76,9 +76,9 @@ tasks.register('runExample12Server', JavaExec) {
 tasks.named('processResources', ProcessResources) {
     // replace placeholders in properties files
     def tokens = [
-        instanceName : providers.gradleProperty("instanceName").orNull,
-        instanceId: providers.gradleProperty("instanceId").orNull,
-        dbName : providers.gradleProperty("dbName").orNull
+        instanceName : "${instanceName}",
+        instanceId: "${instanceId}",
+        dbName : "${dbName}",
     ]
     inputs.properties(tokens)
     filesMatching("**/*.properties") {
@@ -89,12 +89,9 @@ tasks.register('runExample13Instance', JavaExec) {
     description = 'Run Example 13 Instance - all start multiple times and pass parameters'
     mainClass = 'org.quartz.examples.example13.ClusterExample'
     // cd quartz
-    // ../gradlew :examples:processResources :examples:runExample13Instance -PdbName=mssql -PinstanceName=serverScheduler -PinstanceId=instanceId_001
-    // ../gradlew :examples:processResources :examples:runExample13Instance -PdbName=mssql -PinstanceName=updateTemplateScheduler -PinstanceId=instanceId_001
+    // ../gradlew clean build :examples:processResources :examples:runExample13Instance -PdbName=mssql -PinstanceName=serverScheduler -PinstanceId=instanceId_001
+    // ../gradlew clean build :examples:processResources :examples:runExample13Instance -PdbName=mssql -PinstanceName=updateTemplateScheduler -PinstanceId=instanceId_001
     def dynamicUuid = UUID.randomUUID().toString()
-    def instanceName= providers.gradleProperty("instanceName").orNull
-    def instanceId= providers.gradleProperty("instanceId").orNull
-    def dbName= providers.gradleProperty("dbName").orNull
     systemProperty 'quartz.unique.instance.id', "${instanceId}_${instanceName}_${dynamicUuid}"
     systemProperty 'org.quartz.properties', "org/quartz/examples/example13/${dbName}/instance.properties"
 }
