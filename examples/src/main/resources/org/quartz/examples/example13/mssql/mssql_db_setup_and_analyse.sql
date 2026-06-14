@@ -1,6 +1,33 @@
 CREATE DATABASE [quartz252]
 GO
 
+USE [quartz252]
+GO
+
+-- === business table for concurrancy tests === --
+-- === business table for concurrancy tests === --
+-- === business table for concurrancy tests === --
+
+CREATE TABLE DemoInventory (
+    ItemId INT PRIMARY KEY,
+    ItemName VARCHAR(50),
+    Quantity INT
+);
+
+INSERT INTO DemoInventory (ItemId, ItemName, Quantity) VALUES (1, 'Widget', 100);
+
+
+-- check status of RCIS and SNAPSHOT
+SELECT * FROM SYS.DATABASES;
+
+-- Run this to force the Reader Job to throw the lock exception
+ALTER DATABASE [quartz252] SET READ_COMMITTED_SNAPSHOT OFF WITH ROLLBACK IMMEDIATE;
+GO
+
+-- Run this to allow the Reader Job to read the old row version instantly
+ALTER DATABASE [quartz252] SET READ_COMMITTED_SNAPSHOT ON WITH ROLLBACK IMMEDIATE;
+
+
 -- currently blocked sessions
 SELECT 
     blocking_session_id AS Blocking_Session,

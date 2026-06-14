@@ -59,11 +59,10 @@ public class SimpleRecoveryJob implements Job {
 
     JobKey jobKey = context.getJobDetail().getKey();
 
-    // if the job is recovering print a message
     if (context.isRecovering()) {
-      _log.info("SimpleRecoveryJob: " + jobKey + " RECOVERING at " + new Date());
+      _log.info("SimpleRecoveryJob(): {} RECOVERING", jobKey);
     } else {
-      _log.info("SimpleRecoveryJob: " + jobKey + " starting at " + new Date());
+      _log.info("SimpleRecoveryJob(): {} STARTING", jobKey);
     }
 
     // delay for ten seconds
@@ -84,8 +83,6 @@ public class SimpleRecoveryJob implements Job {
     count++;
     data.put(COUNT, count);
 
-    _log.info("SimpleRecoveryJob: " + jobKey + " done at " + new Date() + "\n Execution #" + count);
-
+    _log.info("SimpleRecoveryJob() {} DONE [Execution #{}]", jobKey, count);
   }
-
 }

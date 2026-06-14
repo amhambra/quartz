@@ -23,11 +23,8 @@ import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
+import org.quartz.*;
 import org.quartz.DateBuilder.IntervalUnit;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerFactory;
-import org.quartz.SimpleTrigger;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,8 +116,30 @@ public class ClusterExample {
 
       String schedId = sched.getSchedulerInstanceId();
 
-      int count = 1;
+      int count = 0;
 
+      // === competing read / writer jobs ===
+
+      // 1. Build and schedule the Writer Job to run immediately
+      JobDetail writerJob = JobBuilder.newJob(WriterJob.class)
+              .withIdentity("writerJob", "demoGroup").build();
+      Trigger writerTrigger = TriggerBuilder.newTrigger()
+              .withIdentity("writerTrigger", "demoGroup").startNow().build();
+
+      // 2. Build and schedule the Reader Job to run 2 seconds in the future
+      JobDetail readerJob = JobBuilder.newJob(ReaderJob.class)
+              .withIdentity("readerJob", "demoGroup").build();
+      Trigger readerTrigger = TriggerBuilder.newTrigger()
+              .withIdentity("readerTrigger", "demoGroup")
+              .startAt(DateBuilder.futureDate(2, DateBuilder.IntervalUnit.SECOND))
+              .build();
+
+      sched.scheduleJob(writerJob, writerTrigger);
+      sched.scheduleJob(readerJob, readerTrigger);
+
+      // === other jobs ===
+/*
+      count++;
       JobDetail job = newJob(SimpleRecoveryJob.class).withIdentity("job_" + count, schedId) // put triggers in group
                                                                                             // named after the cluster
                                                                                             // node instance just to
@@ -208,6 +227,7 @@ public class ClusterExample {
       _log.info(job.getKey() + " will run at: " + trigger.getNextFireTime() + " & repeat: " + trigger.getRepeatCount()
                 + "/" + trigger.getRepeatInterval());
       sched.scheduleJob(job, trigger);
+*/
     }
 
     // jobs don't start firing until start() has been called...

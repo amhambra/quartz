@@ -15,7 +15,11 @@
         <level value="info" />
     </logger>
 
+    <logger name="org.quartz.plugins.history.LoggingJobHistoryPlugin">
+        <level value="INFO" />
+    </logger>
 
+    <!--
     <logger name="org.quartz.impl.jdbcjobstore.UpdateLockRowSemaphore">
         <level value="debug" />
     </logger>
@@ -37,6 +41,7 @@
     <logger name="org.quartz.impl.jdbcjobstore.JobStoreSupport">
         <level value="debug" />
     </logger>
+    -->
 
     <!-- mchange logging -->
     <logger name="com.mchange.v2.c3p0.impl.NewProxyPreparedStatement">
